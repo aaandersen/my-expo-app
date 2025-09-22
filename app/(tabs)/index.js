@@ -33,6 +33,18 @@ export default function CalendarScreen() {
 
   useEffect(() => {
     loadEvents();
+    
+    // Listen for event updates
+    const handleEventUpdate = () => {
+      loadEvents();
+    };
+    
+    FamilyCalendarService.addListener(handleEventUpdate);
+    
+    // Cleanup listener on unmount
+    return () => {
+      FamilyCalendarService.removeListener(handleEventUpdate);
+    };
   }, []);
 
   useFocusEffect(

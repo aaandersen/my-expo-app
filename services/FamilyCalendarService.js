@@ -21,6 +21,21 @@ export class FamilyCalendarService {
     }
   ];
 
+  // Event listeners for real-time updates
+  static listeners = [];
+
+  static addListener(callback) {
+    this.listeners.push(callback);
+  }
+
+  static removeListener(callback) {
+    this.listeners = this.listeners.filter(listener => listener !== callback);
+  }
+
+  static notifyListeners() {
+    this.listeners.forEach(callback => callback());
+  }
+
   static async getEvents() {
     try {
       // Try to use real Calendar API first
@@ -63,6 +78,7 @@ export class FamilyCalendarService {
         };
         
         this.mockEvents.push(newEvent);
+        this.notifyListeners(); // Notify calendar to refresh
         return newEvent.id;
       }
 
@@ -81,6 +97,7 @@ export class FamilyCalendarService {
         };
         
         this.mockEvents.push(newEvent);
+        this.notifyListeners(); // Notify calendar to refresh
         return newEvent.id;
       }
 
@@ -93,6 +110,7 @@ export class FamilyCalendarService {
         timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       });
 
+      this.notifyListeners(); // Notify calendar to refresh
       return eventId;
     } catch (error) {
       console.error("Error creating event, adding to mock data:", error);
@@ -108,6 +126,7 @@ export class FamilyCalendarService {
       };
       
       this.mockEvents.push(newEvent);
+      this.notifyListeners(); // Notify calendar to refresh
       return newEvent.id;
     }
   }
