@@ -1,12 +1,11 @@
 import { useFocusEffect } from '@react-navigation/native';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import { FlatList, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { FamilyCalendarService } from '../../services/FamilyCalendarService';
+import { useEvents } from '../../contexts/EventContext';
 
 export default function CalendarScreen() {
-  const [events, setEvents] = useState([]);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const { events, isLoading, refreshEvents } = useEvents();
+  const selectedDate = new Date().toISOString().split('T')[0];
 
   const today = new Date();
   const todayEvents = events.filter(event => {
@@ -31,43 +30,15 @@ export default function CalendarScreen() {
     event.title.toLowerCase().includes('fam')
   );
 
-  useEffect(() => {
-    loadEvents();
-    
-    // Listen for event updates
-    const handleEventUpdate = () => {
-      loadEvents();
-    };
-    
-    FamilyCalendarService.addListener(handleEventUpdate);
-    
-    // Cleanup listener on unmount
-    return () => {
-      FamilyCalendarService.removeListener(handleEventUpdate);
-    };
-  }, []);
-
   useFocusEffect(
     useCallback(() => {
-      loadEvents();
-    }, [])
+      console.log('Calendar screen focused, refreshing events');
+      refreshEvents();
+    }, [refreshEvents])
   );
 
-  const loadEvents = async () => {
-    try {
-      console.log('Loading events...');
-      const calendarEvents = await FamilyCalendarService.getEvents();
-      console.log('Loaded events:', calendarEvents.length);
-      setEvents(calendarEvents);
-    } catch (error) {
-      console.error('Error loading events:', error);
-    }
-  };
-
   const onRefresh = async () => {
-    setIsRefreshing(true);
-    await loadEvents();
-    setIsRefreshing(false);
+    refreshEvents();
   };
 
   const renderEvent = ({ item }) => (
@@ -91,7 +62,7 @@ export default function CalendarScreen() {
     <ScrollView 
       style={styles.container}
       refreshControl={
-        <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
+        <RefreshControl refreshing={isLoading} onRefresh={onRefresh} />
       }
     >
       <View style={styles.header}>

@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Alert, FlatList, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { FamilyCalendarService } from '../../services/FamilyCalendarService';
+import { useEvents } from '../../contexts/EventContext';
 
 export default function PlannerScreen() {
+  const { refreshEvents } = useEvents();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -162,12 +164,18 @@ export default function PlannerScreen() {
       Alert.alert('Succes', `Begivenheden "${eventTitle}" er oprettet!`);
       setShowCreateModal(false);
       resetForm();
+      
+      // Explicitly refresh events in context
+      refreshEvents();
     } catch (error) {
       console.error('Error creating event:', error);
       // Always close the modal and reset form, even if there's an error
       Alert.alert('Info', 'Begivenheden er tilføjet til appen (Calendar API ikke tilgængelig i browser)');
       setShowCreateModal(false);
       resetForm();
+      
+      // Also refresh on error since we might have added to mock data
+      refreshEvents();
     }
   };
 
