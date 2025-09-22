@@ -1,7 +1,7 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { colors } from '../styles/globalStyles';
 import { EventProvider } from '../contexts/EventContext';
+import { colors } from '../styles/globalStyles';
 
 export default function RootLayout() {
   return (

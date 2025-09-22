@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { FamilyCalendarService } from '../services/FamilyCalendarService';
 
 const EventContext = createContext();
@@ -29,10 +29,18 @@ export const EventProvider = ({ children }) => {
   };
 
   const refreshEvents = () => {
+    console.log('EventContext: Explicit refresh called');
     loadEvents();
   };
 
+  const addEventDirectly = (newEvent) => {
+    console.log('EventContext: Adding event directly:', newEvent.title);
+    setEvents(prevEvents => [...prevEvents, newEvent]);
+  };
+
   useEffect(() => {
+    // Force reload from storage first
+    FamilyCalendarService.loadFromStorage();
     loadEvents();
     
     // Listen for event updates
@@ -53,7 +61,8 @@ export const EventProvider = ({ children }) => {
     events,
     isLoading,
     refreshEvents,
-    loadEvents
+    loadEvents,
+    addEventDirectly
   };
 
   return (

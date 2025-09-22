@@ -16,8 +16,10 @@ export class FamilyCalendarService {
     try {
       if (typeof window !== 'undefined' && window.localStorage) {
         const stored = localStorage.getItem('famtime-events');
+        console.log('Loading from storage:', stored);
         if (stored) {
           this.mockEvents = JSON.parse(stored);
+          console.log('Loaded events from storage:', this.mockEvents.length);
         }
       }
     } catch (error) {
@@ -28,6 +30,7 @@ export class FamilyCalendarService {
   static saveToStorage() {
     try {
       if (typeof window !== 'undefined' && window.localStorage) {
+        console.log('Saving to storage:', this.mockEvents.length, 'events');
         localStorage.setItem('famtime-events', JSON.stringify(this.mockEvents));
       }
     } catch (error) {
@@ -56,6 +59,9 @@ export class FamilyCalendarService {
 
   static async getEvents() {
     try {
+      // Always reload from storage first to ensure fresh data
+      this.loadFromStorage();
+      
       // Try to use real Calendar API first
       const { status } = await Calendar.requestCalendarPermissionsAsync();
       if (status !== "granted") {

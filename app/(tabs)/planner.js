@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Alert, FlatList, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { FamilyCalendarService } from '../../services/FamilyCalendarService';
 import { useEvents } from '../../contexts/EventContext';
+import { FamilyCalendarService } from '../../services/FamilyCalendarService';
 
 export default function PlannerScreen() {
-  const { refreshEvents } = useEvents();
+  const { refreshEvents, addEventDirectly } = useEvents();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -161,12 +161,22 @@ export default function PlannerScreen() {
         notes: eventForm.description
       });
 
+      // Add event directly to context for immediate UI update
+      addEventDirectly({
+        id: eventId,
+        title: eventTitle,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+        location: eventForm.location,
+        notes: eventForm.description
+      });
+
       Alert.alert('Succes', `Begivenheden "${eventTitle}" er oprettet!`);
       setShowCreateModal(false);
       resetForm();
       
-      // Explicitly refresh events in context
-      refreshEvents();
+      // Also refresh to ensure sync
+      setTimeout(() => refreshEvents(), 100);
     } catch (error) {
       console.error('Error creating event:', error);
       // Always close the modal and reset form, even if there's an error
@@ -175,7 +185,7 @@ export default function PlannerScreen() {
       resetForm();
       
       // Also refresh on error since we might have added to mock data
-      refreshEvents();
+      setTimeout(() => refreshEvents(), 100);
     }
   };
 
