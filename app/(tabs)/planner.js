@@ -4,6 +4,7 @@ import { FamilyCalendarService } from '../../services/FamilyCalendarService';
 
 export default function PlannerScreen() {
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [eventForm, setEventForm] = useState({
     title: '',
@@ -68,6 +69,56 @@ export default function PlannerScreen() {
 
   const familyMembers = ['Mor', 'Far', 'Emma', 'Lucas'];
 
+  // Helper functions for date generation
+  const formatDate = (date) => {
+    return date.toISOString().split('T')[0];
+  };
+
+  const getDateOptions = () => {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const nextWeek = new Date(today);
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    
+    const nextWeekend = new Date(today);
+    const daysUntilSaturday = (6 - today.getDay()) % 7;
+    nextWeekend.setDate(today.getDate() + (daysUntilSaturday || 7));
+
+    return [
+      { 
+        id: 'today', 
+        label: 'I dag', 
+        date: formatDate(today),
+        subtitle: today.toLocaleDateString('da-DK', { weekday: 'long', day: 'numeric', month: 'short' })
+      },
+      { 
+        id: 'tomorrow', 
+        label: 'I morgen', 
+        date: formatDate(tomorrow),
+        subtitle: tomorrow.toLocaleDateString('da-DK', { weekday: 'long', day: 'numeric', month: 'short' })
+      },
+      { 
+        id: 'weekend', 
+        label: 'Næste weekend', 
+        date: formatDate(nextWeekend),
+        subtitle: nextWeekend.toLocaleDateString('da-DK', { weekday: 'long', day: 'numeric', month: 'short' })
+      },
+      { 
+        id: 'week', 
+        label: 'Næste uge', 
+        date: formatDate(nextWeek),
+        subtitle: nextWeek.toLocaleDateString('da-DK', { weekday: 'long', day: 'numeric', month: 'short' })
+      }
+    ];
+  };
+
+  const handleDateSelect = (selectedDate) => {
+    setEventForm(prev => ({ ...prev, date: selectedDate }));
+    setShowDatePicker(false);
+  };
+
   const handleTemplateSelect = (template) => {
     setSelectedTemplate(template);
     setEventForm(prev => ({
@@ -131,6 +182,7 @@ export default function PlannerScreen() {
       participants: []
     });
     setSelectedTemplate(null);
+    setShowDatePicker(false);
   };
 
   const renderTemplate = ({ item }) => (
@@ -225,12 +277,23 @@ export default function PlannerScreen() {
             <View style={styles.formRow}>
               <View style={styles.formGroupHalf}>
                 <Text style={styles.formLabel}>Dato</Text>
-                <TextInput
-                  style={styles.formInput}
-                  value={eventForm.date}
-                  onChangeText={(text) => setEventForm(prev => ({ ...prev, date: text }))}
-                  placeholder="YYYY-MM-DD"
-                />
+                <TouchableOpacity 
+                  style={[styles.formInput, styles.datePickerButton]}
+                  onPress={() => setShowDatePicker(true)}
+                >
+                  <Text style={[styles.datePickerText, !eventForm.date && styles.placeholderText]}>
+                    {eventForm.date ? 
+                      new Date(eventForm.date).toLocaleDateString('da-DK', { 
+                        weekday: 'short', 
+                        day: 'numeric', 
+                        month: 'short', 
+                        year: 'numeric' 
+                      }) : 
+                      'Vælg dato'
+                    }
+                  </Text>
+                  <Text style={styles.dropdownIcon}>📅</Text>
+                </TouchableOpacity>
               </View>
               <View style={styles.formGroupHalf}>
                 <Text style={styles.formLabel}>Tidspunkt</Text>
@@ -290,6 +353,74 @@ export default function PlannerScreen() {
               <Text style={styles.saveButtonText}>Opret begivenhed</Text>
             </TouchableOpacity>
           </ScrollView>
+        </View>
+      </Modal>
+
+      {/* Date Picker Modal */}
+      <Modal
+        visible={showDatePicker}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        transparent={true}
+      >
+        <View style={styles.datePickerOverlay}>
+          <View style={styles.datePickerModal}>
+            <View style={styles.datePickerHeader}>
+              <Text style={styles.datePickerTitle}>Vælg dato</Text>
+              <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                <Text style={styles.cancelButton}>Luk</Text>
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView style={styles.datePickerContent}>
+              <Text style={styles.datePickerSectionTitle}>Hurtig vælger</Text>
+              {getDateOptions().map((option) => (
+                <TouchableOpacity
+                  key={option.id}
+                  style={[
+                    styles.dateOption,
+                    eventForm.date === option.date && styles.dateOptionSelected
+                  ]}
+                  onPress={() => handleDateSelect(option.date)}
+                >
+                  <View style={styles.dateOptionContent}>
+                    <Text style={[
+                      styles.dateOptionLabel,
+                      eventForm.date === option.date && styles.dateOptionLabelSelected
+                    ]}>
+                      {option.label}
+                    </Text>
+                    <Text style={[
+                      styles.dateOptionSubtitle,
+                      eventForm.date === option.date && styles.dateOptionSubtitleSelected
+                    ]}>
+                      {option.subtitle}
+                    </Text>
+                  </View>
+                  {eventForm.date === option.date && (
+                    <Text style={styles.checkIcon}>✓</Text>
+                  )}
+                </TouchableOpacity>
+              ))}
+              
+              <Text style={styles.datePickerSectionTitle}>Manuel indtastning</Text>
+              <View style={styles.manualDateInput}>
+                <TextInput
+                  style={styles.manualDateTextInput}
+                  value={eventForm.date}
+                  onChangeText={(text) => setEventForm(prev => ({ ...prev, date: text }))}
+                  placeholder="YYYY-MM-DD"
+                  placeholderTextColor="#999"
+                />
+                <TouchableOpacity 
+                  style={styles.manualDateButton}
+                  onPress={() => setShowDatePicker(false)}
+                >
+                  <Text style={styles.manualDateButtonText}>Gem</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
         </View>
       </Modal>
     </ScrollView>
@@ -470,5 +601,121 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: 'white',
+  },
+  // Date Picker Styles
+  datePickerButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  datePickerText: {
+    fontSize: 16,
+    color: '#333',
+    flex: 1,
+  },
+  placeholderText: {
+    color: '#999',
+  },
+  dropdownIcon: {
+    fontSize: 16,
+    color: '#666',
+  },
+  datePickerOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  datePickerModal: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '80%',
+  },
+  datePickerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  datePickerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  datePickerContent: {
+    padding: 20,
+  },
+  datePickerSectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#4CAF50',
+    marginBottom: 15,
+    marginTop: 10,
+  },
+  dateOption: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 15,
+    borderRadius: 10,
+    backgroundColor: '#f8f9fa',
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  dateOptionSelected: {
+    backgroundColor: '#E8F5E8',
+    borderColor: '#4CAF50',
+  },
+  dateOptionContent: {
+    flex: 1,
+  },
+  dateOptionLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 2,
+  },
+  dateOptionLabelSelected: {
+    color: '#4CAF50',
+  },
+  dateOptionSubtitle: {
+    fontSize: 14,
+    color: '#666',
+  },
+  dateOptionSubtitleSelected: {
+    color: '#4CAF50',
+  },
+  checkIcon: {
+    fontSize: 18,
+    color: '#4CAF50',
+    fontWeight: 'bold',
+  },
+  manualDateInput: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  manualDateTextInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: '#f9f9f9',
+    marginRight: 10,
+  },
+  manualDateButton: {
+    backgroundColor: '#4CAF50',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  manualDateButtonText: {
+    color: 'white',
+    fontWeight: '600',
   },
 });
