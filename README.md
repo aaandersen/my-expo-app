@@ -1,3 +1,6 @@
+# 📱 FamTime - Demo video link YT
+https://youtube.com/shorts/CgFtbgMMZto?feature=share
+
 # 📱 FamTime - Familie Kalender App
 
 En React Native Expo app til familieplanlægning og koordinering af aktiviteter.
