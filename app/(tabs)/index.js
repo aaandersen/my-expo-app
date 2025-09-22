@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback, useEffect, useState } from 'react';
 import { FlatList, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { FamilyCalendarService } from '../../services/FamilyCalendarService';
 
@@ -27,6 +28,12 @@ export default function CalendarScreen() {
   useEffect(() => {
     loadEvents();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadEvents();
+    }, [])
+  );
 
   const loadEvents = async () => {
     try {
