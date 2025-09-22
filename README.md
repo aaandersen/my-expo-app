@@ -49,28 +49,31 @@ FamTime hjælper familier med at planlægge og koordinere aktiviteter ved at:
 
 ### Tech Stack:
 - **React Native** med Expo Router
-- **Expo Calendar API** til kalender integration
+- **JavaScript** (ES6+) konfiguration
+- **React Context** til state management
+- **AsyncStorage/localStorage** til data persistence
+- **react-native-safe-area-context** til iPhone optimering
 - **StyleSheet** til styling
-- **FlatList** til effektiv listevisning
 
 ### Arkitektur:
 ```
 app/
 ├── (tabs)/
-│   ├── index.tsx         # Kalender Integration
-│   ├── explore.tsx       # Familie Oversigt  
-│   ├── schedule.tsx      # Ledige Tider
-│   ├── planner.tsx       # Planlæg Aktiviteter
-│   └── _layout.tsx       # Tab Navigation
-├── _layout.tsx           # Root Layout
-└── modal.tsx             # Modal Screens
+│   ├── index.js          # Kalender Visning & Event Detaljer
+│   ├── explore.js        # Familie Oversigt & Medlemmer
+│   ├── schedule.js       # Ledig Tid Finder
+│   ├── planner.js        # Event Oprettelse & Templates
+│   └── _layout.js        # Tab Navigation Layout
+└── _layout.js            # Root Layout med SafeArea
+
+contexts/
+└── EventContext.js       # Global Event State Management
 
 services/
-└── FamilyCalendarService.ts  # Kalender Logic & Algoritmer
+└── FamilyCalendarService.js  # Kalender API & Storage Logic
 
-components/
-├── ui/                   # UI Komponenter
-└── ...                   # Themed Komponenter
+styles/
+└── globalStyles.js       # Globale Style Definitioner
 ```
 
 ### 🔧 Tekniske Krav (Opfyldt):
