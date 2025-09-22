@@ -55,7 +55,9 @@ export default function CalendarScreen() {
 
   const loadEvents = async () => {
     try {
+      console.log('Loading events...');
       const calendarEvents = await FamilyCalendarService.getEvents();
+      console.log('Loaded events:', calendarEvents.length);
       setEvents(calendarEvents);
     } catch (error) {
       console.error('Error loading events:', error);

@@ -44,7 +44,14 @@ export class FamilyCalendarService {
   }
 
   static notifyListeners() {
-    this.listeners.forEach(callback => callback());
+    console.log('Notifying listeners, count:', this.listeners.length);
+    this.listeners.forEach(callback => {
+      try {
+        callback();
+      } catch (error) {
+        console.error('Error in listener callback:', error);
+      }
+    });
   }
 
   static async getEvents() {
@@ -89,6 +96,7 @@ export class FamilyCalendarService {
         };
         
         this.mockEvents.push(newEvent);
+        console.log('Added new event (no permission), total events:', this.mockEvents.length);
         this.saveToStorage(); // Save to localStorage
         this.notifyListeners(); // Notify calendar to refresh
         return newEvent.id;
