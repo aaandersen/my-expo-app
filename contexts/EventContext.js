@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { FamilyCalendarService } from '../services/FamilyCalendarService';
 
 const EventContext = createContext();
@@ -15,7 +15,7 @@ export const EventProvider = ({ children }) => {
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const loadEvents = async () => {
+  const loadEvents = useCallback(async () => {
     setIsLoading(true);
     try {
       const calendarEvents = await FamilyCalendarService.getEvents();
@@ -26,17 +26,17 @@ export const EventProvider = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const refreshEvents = () => {
+  const refreshEvents = useCallback(() => {
     console.log('EventContext: Explicit refresh called');
     loadEvents();
-  };
+  }, [loadEvents]);
 
-  const addEventDirectly = (newEvent) => {
+  const addEventDirectly = useCallback((newEvent) => {
     console.log('EventContext: Adding event directly:', newEvent.title);
     setEvents(prevEvents => [...prevEvents, newEvent]);
-  };
+  }, []);
 
   useEffect(() => {
     // Force reload from storage first
@@ -44,10 +44,10 @@ export const EventProvider = ({ children }) => {
     loadEvents();
     
     // Listen for event updates
-    const handleEventUpdate = () => {
+    const handleEventUpdate = useCallback(() => {
       console.log('EventContext: Received event update notification');
       loadEvents();
-    };
+    }, [loadEvents]);
     
     FamilyCalendarService.addListener(handleEventUpdate);
     
