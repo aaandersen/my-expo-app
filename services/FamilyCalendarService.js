@@ -6,10 +6,18 @@ export class FamilyCalendarService {
     {
       id: 'mock-1',
       title: 'Familieudflyt til zoo',
-      startDate: new Date().toISOString(),
-      endDate: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
+      startDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
+      endDate: new Date(Date.now() + 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000).toISOString(),
       location: 'Københavns Zoo',
       notes: 'En hyggelig dag sammen'
+    },
+    {
+      id: 'mock-2',
+      title: 'Familie pizza aften',
+      startDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days from now
+      endDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000 + 90 * 60 * 1000).toISOString(),
+      location: 'Hjemme',
+      notes: 'Hyggeaften med pizza og film'
     }
   ];
 

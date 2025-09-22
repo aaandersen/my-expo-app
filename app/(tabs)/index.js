@@ -14,11 +14,17 @@ export default function CalendarScreen() {
     return eventDate.toDateString() === today.toDateString();
   });
 
+  // Filter for upcoming family events (within next 7 days AND contains family keywords)
   const upcomingEvents = events.filter(event => {
     const eventDate = new Date(event.startDate);
-    return eventDate > today && eventDate <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    const isUpcoming = eventDate > today && eventDate <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    const isFamilyEvent = event.title.toLowerCase().includes('familie') || 
+                         event.title.toLowerCase().includes('family') ||
+                         event.title.toLowerCase().includes('fam');
+    return isUpcoming && isFamilyEvent;
   });
 
+  // All family events (regardless of date)
   const familyEvents = events.filter(event => 
     event.title.toLowerCase().includes('familie') || 
     event.title.toLowerCase().includes('family') ||

@@ -26,7 +26,7 @@ export default function PlannerScreen() {
     },
     {
       id: 2,
-      title: 'Filmaften',
+      title: 'Familie filmaften',
       icon: '🎬',
       duration: 120,
       suggestedTime: '19:30',
@@ -34,7 +34,7 @@ export default function PlannerScreen() {
     },
     {
       id: 3,
-      title: 'Spilaften',
+      title: 'Familie spilaften',
       icon: '🎲',
       duration: 90,
       suggestedTime: '19:00',
@@ -42,7 +42,7 @@ export default function PlannerScreen() {
     },
     {
       id: 4,
-      title: 'Udendørs aktivitet',
+      title: 'Familie udendørs aktivitet',
       icon: '🏃‍♂️',
       duration: 60,
       suggestedTime: '15:00',
@@ -50,7 +50,7 @@ export default function PlannerScreen() {
     },
     {
       id: 5,
-      title: 'Kreativ tid',
+      title: 'Familie kreativ tid',
       icon: '🎨',
       duration: 90,
       suggestedTime: '14:00',
@@ -58,7 +58,7 @@ export default function PlannerScreen() {
     },
     {
       id: 6,
-      title: 'Læsetid',
+      title: 'Familie læsetid',
       icon: '📚',
       duration: 45,
       suggestedTime: '20:00',
@@ -90,15 +90,25 @@ export default function PlannerScreen() {
       const startDate = new Date(`${eventForm.date}T${eventForm.time}`);
       const endDate = new Date(startDate.getTime() + parseInt(eventForm.duration) * 60000);
 
+      // Automatically add "Familie" prefix if not already family-related
+      let eventTitle = eventForm.title;
+      const isFamilyTitle = eventTitle.toLowerCase().includes('familie') || 
+                           eventTitle.toLowerCase().includes('family') ||
+                           eventTitle.toLowerCase().includes('fam');
+      
+      if (!isFamilyTitle) {
+        eventTitle = `Familie ${eventTitle}`;
+      }
+
       const eventId = await FamilyCalendarService.createEvent({
-        title: eventForm.title,
+        title: eventTitle,
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString(),
         location: eventForm.location,
         notes: eventForm.description
       });
 
-      Alert.alert('Succes', 'Begivenheden er oprettet!');
+      Alert.alert('Succes', `Begivenheden "${eventTitle}" er oprettet!`);
       setShowCreateModal(false);
       resetForm();
     } catch (error) {
