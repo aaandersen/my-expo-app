@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./app/*"],
+      "@/services/*": ["./services/*"]
+    },
+    "checkJs": false,
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react-jsx"
+  },
+  "include": [
+    "app/**/*",
+    "services/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    ".expo"
+  ]
+}
