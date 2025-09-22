@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { FlatList, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ScheduleScreen() {
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const insets = useSafeAreaInsets();
   const [filters, setFilters] = useState({
     minDuration: 60,
     includeWeekends: true,
@@ -126,11 +128,14 @@ export default function ScheduleScreen() {
   );
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Ledig tid finder</Text>
-        <Text style={styles.subtitle}>Find den perfekte tid til familieaktiviteter</Text>
-      </View>
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <ScrollView 
+        style={styles.scrollContainer}
+        contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
+      >
+        <View style={[styles.header, { paddingTop: 20 }]}>
+          <Text style={styles.title}>Ledig tid finder</Text>
+        </View>
 
       <FilterSection />
 
@@ -179,6 +184,7 @@ export default function ScheduleScreen() {
         </View>
       </View>
     </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -186,6 +192,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+  },
+  scrollContainer: {
+    flex: 1,
   },
   header: {
     padding: 20,

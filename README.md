@@ -1,42 +1,49 @@
-# FamTime - Apple Calendar Sync App 📅👨‍👩‍👧‍👦
+# 📱 FamTime - Familie Kalender App
 
-En React Native Expo app der synkroniserer med Apple Calendar for at finde og administrere familietid.
+En React Native Expo app til familieplanlægning og koordinering af aktiviteter.
 
 ## 🎯 App Koncept
 
-FamTime hjælper familier med at finde ledige tidspunkter til kvalitetstid sammen ved at:
-- Synkronisere med Apple/iOS kalendere
-- Analysere familiemedlemmers kalendere automatisk
-- Foreslå optimale tidspunkter for familieaktiviteter
-- Gøre det nemt at planlægge og oprette familieevents
+FamTime hjælper familier med at planlægge og koordinere aktiviteter ved at:
+- Oprette og håndtere familiebegivenheder
+- Give overblik over familiens kalender
+- Finde ledige tidspunkter til familieaktiviteter  
+- Gøre det nemt at planlægge kvalitetstid sammen
 
-## ✨ Funktionaliteter
+## ✨ Features
+
+🗓️ **Kalender Visning**: Se alle familiebegivenheder i en intuitiv kalendervisning  
+📅 **Event Oprettelse**: Opret begivenheder med avancerede dato/tid pickers  
+👨‍👩‍👧‍👦 **Familie Oversigt**: Se status på alle familiemedlemmer  
+⏰ **Ledig Tid Finder**: Find tidspunkter hvor alle er ledige  
+🎯 **Activity Templates**: Hurtige skabeloner til populære familieaktiviteter  
+📱 **iPhone 14 Pro Optimeret**: Perfect tilpasset til moderne iPhone skærme med safe areas
 
 ### 📱 4 Hovedskærme:
 
-1. **Kalender Integration** (`index.js`)
-   - Forbind til Apple Calendar
-   - Se dagens events på tværs af familiens kalendere
-   - Synkroniser kalenderdata
-   - Oversigt over tilsluttede kalendere
+1. **Kalender** (`index.js`)
+   - Grupperet visning af begivenheder pr. dato
+   - Detaljeret event modal med sletning
+   - Pull-to-refresh funktionalitet
+   - Elegant dato headers (I dag, I morgen, etc.)
 
 2. **Familie Oversigt** (`explore.js`)
-   - Visualiser alle familiemedlemmers kalendere
-   - Se antal events per person
-   - Statistik over familiens aktivitetsniveau
-   - Hurtig adgang til individuelle kalendere
+   - Familiemedlemmers status og tilgængelighed
+   - Ugentlige statistikker
+   - Næste begivenhed oversigt
+   - Clean og oversigteligt design
 
-3. **Ledige Tider** (`schedule.js`)
-   - Intelligent algoritme finder ledige tidspunkter
-   - Visualisering af tilgængelighed (alle/de fleste/få ledige)
-   - Datovælger for fremtidige dage
-   - Direkte planlægning fra ledige slots
+3. **Ledig Tid Finder** (`schedule.js`)
+   - Intelligent visning af tilgængelige tidspunkter
+   - Filtrering efter præferencer
+   - Farvekodning baseret på tilgængelighed
+   - Konflikthåndtering
 
-4. **Planlæg Familietid** (`planner.js`)
-   - Skabeloner til populære familieaktiviteter
-   - Tilpassede aktivitetsformularer
-   - Forslag til optimale tidspunkter
-   - Opret events direkte i kalenderen
+4. **Planlæg** (`planner.js`)
+   - 8 forudkonfigurerede aktivitetsskabeloner
+   - Avancerede dato/tid pickers med fuld-skærm modals
+   - Brugerdefineret begivenhedssoprettelse
+   - Integration med lokalt storage og Calendar API
 
 ## 🛠 Teknisk Implementation
 

@@ -9,6 +9,11 @@ export class FamilyCalendarService {
 
   // Load events from localStorage on service initialization
   static {
+    // Clear localStorage for clean start - remove this line after testing
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.removeItem('famtime-events');
+      console.log('Cleared localStorage for clean start');
+    }
     this.loadFromStorage();
   }
 
@@ -18,12 +23,25 @@ export class FamilyCalendarService {
         const stored = localStorage.getItem('famtime-events');
         console.log('Loading from storage:', stored);
         if (stored) {
-          this.mockEvents = JSON.parse(stored);
-          console.log('Loaded events from storage:', this.mockEvents.length);
+          const parsed = JSON.parse(stored);
+          // Validate each event has proper date structure
+          this.mockEvents = parsed.filter(event => {
+            const hasValidDate = event.startDate || (event.date && event.time);
+            if (!hasValidDate) {
+              console.warn('Filtering out invalid event:', event);
+            }
+            return hasValidDate;
+          });
+          console.log('Loaded valid events from storage:', this.mockEvents.length);
         }
       }
     } catch (error) {
-      console.log('Could not load events from storage:', error);
+      console.log('Could not load events from storage, clearing:', error);
+      // Clear corrupted data
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.removeItem('famtime-events');
+      }
+      this.mockEvents = [];
     }
   }
 
@@ -62,10 +80,44 @@ export class FamilyCalendarService {
       // Always reload from storage first to ensure fresh data
       this.loadFromStorage();
       
+      // Filter out any events with invalid dates before returning
+      this.mockEvents = this.mockEvents.filter(event => {
+        try {
+          if (event.startDate) {
+            const testDate = new Date(event.startDate);
+            if (isNaN(testDate.getTime())) {
+              console.warn('Removing event with invalid startDate:', event);
+              return false;
+            }
+            // Extra check for toISOString
+            testDate.toISOString();
+            return true;
+          } else if (event.date && event.time) {
+            const testDate = new Date(`${event.date}T${event.time}`);
+            if (isNaN(testDate.getTime())) {
+              console.warn('Removing event with invalid date/time:', event);
+              return false;
+            }
+            // Extra check for toISOString
+            testDate.toISOString();
+            return true;
+          } else {
+            console.warn('Removing event with no valid date:', event);
+            return false;
+          }
+        } catch (error) {
+          console.error('Error validating event, removing:', error, event);
+          return false;
+        }
+      });
+      
+      // Save cleaned data back to storage
+      this.saveToStorage();
+      
       // Try to use real Calendar API first
       const { status } = await Calendar.requestCalendarPermissionsAsync();
       if (status !== "granted") {
-        console.log("Calendar permission not granted, using mock data");
+        console.log("Calendar permission not granted, using cleaned mock data");
         return this.mockEvents;
       }
       
@@ -76,10 +128,10 @@ export class FamilyCalendarService {
       
       const events = await Calendar.getEventsAsync(calendarIds, startDate, endDate);
       
-      // Combine real events with mock events
+      // Combine real events with cleaned mock events
       return [...events, ...this.mockEvents];
     } catch (error) {
-      console.error("Error getting events, using mock data:", error);
+      console.error("Error getting events, using cleaned mock data:", error);
       return this.mockEvents;
     }
   }
@@ -156,6 +208,62 @@ export class FamilyCalendarService {
       this.saveToStorage(); // Save to localStorage
       this.notifyListeners(); // Notify calendar to refresh
       return newEvent.id;
+    }
+  }
+
+  static async deleteEvent(eventId) {
+    console.log('FamilyCalendarService.deleteEvent called with ID:', eventId);
+    console.log('Current mockEvents before deletion:', this.mockEvents.length);
+    console.log('All events:', this.mockEvents.map(e => ({ id: e.id, title: e.title })));
+    
+    try {
+      // Try to delete from real Calendar API first
+      const { status } = await Calendar.requestCalendarPermissionsAsync();
+      if (status === "granted") {
+        // Only attempt to delete from real calendar if it's not a mock event
+        if (!eventId.includes('mock')) {
+          try {
+            await Calendar.deleteEventAsync(eventId);
+            console.log('Event deleted from real calendar:', eventId);
+          } catch (error) {
+            console.log('Could not delete from real calendar, continuing with mock deletion:', error.message);
+          }
+        }
+      }
+
+      // Always remove from mock events (handles both mock and real events stored locally)
+      const initialLength = this.mockEvents.length;
+      this.mockEvents = this.mockEvents.filter(event => event.id !== eventId);
+      
+      console.log('After filtering: mockEvents length changed from', initialLength, 'to', this.mockEvents.length);
+      console.log('Remaining events:', this.mockEvents.map(e => ({ id: e.id, title: e.title })));
+      
+      const wasRemoved = this.mockEvents.length < initialLength;
+      
+      if (wasRemoved) {
+        console.log('Event successfully removed from mock data:', eventId);
+        this.saveToStorage();
+        this.notifyListeners();
+        return true;
+      } else {
+        console.log('Event not found in mock data with ID:', eventId);
+        return false;
+      }
+    } catch (error) {
+      console.error("Error deleting event:", error);
+      
+      // Fallback: always try to remove from mock data
+      const initialLength = this.mockEvents.length;
+      this.mockEvents = this.mockEvents.filter(event => event.id !== eventId);
+      
+      const wasRemoved = this.mockEvents.length < initialLength;
+      if (wasRemoved) {
+        console.log('Event removed in fallback:', eventId);
+        this.saveToStorage();
+        this.notifyListeners();
+        return true;
+      }
+      return false;
     }
   }
 

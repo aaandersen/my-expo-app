@@ -1,5 +1,16 @@
+import { Platform, StatusBar } from 'react-native';
+
 export const colors = {
-  primary: '#6B73FF',
+  primary: '#6B73FF', // 🔧 Ændre denne til din ønskede farve!
+  // primary: '#FF6B6B', // ❤️ Rød 
+  // primary: '#4ECDC4', // 💚 Teal
+  // primary: '#45B7D1', // 💙 Blå
+  // primary: '#96CEB4', // 💚 Mint
+  // primary: '#FECA57', // 💛 Gul
+  // primary: '#FF9FF3', // 💗 Pink
+  // primary: '#54A0FF', // 💙 Lys blå
+  // primary: '#5F27CD', // 💜 Lilla
+  // primary: '#000000', // ⚫ Sort
   secondary: '#9C27B0',
   accent: '#FF5722',
   success: '#4CAF50',
@@ -19,7 +30,8 @@ export const spacing = {
   sm: 8,
   md: 16,
   lg: 24,
-  xl: 32
+  xl: 32,
+  statusBar: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight || 0
 };
 
 export const typography = {

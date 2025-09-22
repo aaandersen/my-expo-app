@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function FamilyOverviewScreen() {
   const [selectedPeriod, setSelectedPeriod] = useState('week');
+  const insets = useSafeAreaInsets();
 
   const familyMembers = [
     { 
@@ -37,13 +39,6 @@ export default function FamilyOverviewScreen() {
       weeklyHours: 30,
       freeHours: 10
     }
-  ];
-
-  const quickActions = [
-    { id: 1, title: 'Planlæg familietid', icon: '👨‍👩‍👧‍👦', action: 'plan' },
-    { id: 2, title: 'Find ledig tid', icon: '⏰', action: 'schedule' },
-    { id: 3, title: 'Opret begivenhed', icon: '📅', action: 'create' },
-    { id: 4, title: 'Se ugeoversigt', icon: '📊', action: 'overview' }
   ];
 
   const getStatusColor = (status) => {
@@ -87,19 +82,15 @@ export default function FamilyOverviewScreen() {
     </View>
   );
 
-  const renderQuickAction = ({ item }) => (
-    <TouchableOpacity style={styles.actionCard}>
-      <Text style={styles.actionIcon}>{item.icon}</Text>
-      <Text style={styles.actionTitle}>{item.title}</Text>
-    </TouchableOpacity>
-  );
-
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Familieoversigt</Text>
-        <Text style={styles.subtitle}>Status lige nu</Text>
-      </View>
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <ScrollView 
+        style={styles.scrollContainer}
+        contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
+      >
+        <View style={[styles.header, { paddingTop: 20 }]}>
+          <Text style={styles.title}>Familieoversigt</Text>
+        </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Familiemedlemmer</Text>
@@ -108,18 +99,6 @@ export default function FamilyOverviewScreen() {
           renderItem={renderFamilyMember}
           keyExtractor={(item) => item.id.toString()}
           scrollEnabled={false}
-        />
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Hurtige handlinger</Text>
-        <FlatList
-          data={quickActions}
-          renderItem={renderQuickAction}
-          keyExtractor={(item) => item.id.toString()}
-          numColumns={2}
-          scrollEnabled={false}
-          columnWrapperStyle={styles.actionRow}
         />
       </View>
 
@@ -141,6 +120,7 @@ export default function FamilyOverviewScreen() {
         </View>
       </View>
     </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -148,6 +128,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+  },
+  scrollContainer: {
+    flex: 1,
   },
   header: {
     padding: 20,
