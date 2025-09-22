@@ -38,16 +38,16 @@ export const EventProvider = ({ children }) => {
     setEvents(prevEvents => [...prevEvents, newEvent]);
   }, []);
 
+  // Listen for event updates - must be defined outside useEffect
+  const handleEventUpdate = useCallback(() => {
+    console.log('EventContext: Received event update notification');
+    loadEvents();
+  }, [loadEvents]);
+
   useEffect(() => {
     // Force reload from storage first
     FamilyCalendarService.loadFromStorage();
     loadEvents();
-    
-    // Listen for event updates
-    const handleEventUpdate = useCallback(() => {
-      console.log('EventContext: Received event update notification');
-      loadEvents();
-    }, [loadEvents]);
     
     FamilyCalendarService.addListener(handleEventUpdate);
     
@@ -55,7 +55,7 @@ export const EventProvider = ({ children }) => {
     return () => {
       FamilyCalendarService.removeListener(handleEventUpdate);
     };
-  }, []);
+  }, [loadEvents, handleEventUpdate]);
 
   const value = {
     events,
