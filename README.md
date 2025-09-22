@@ -43,7 +43,6 @@ FamTime hjælper familier med at finde ledige tidspunkter til kvalitetstid samme
 ### Tech Stack:
 - **React Native** med Expo Router
 - **Expo Calendar API** til kalender integration
-- **TypeScript** for type safety
 - **StyleSheet** til styling
 - **FlatList** til effektiv listevisning
 
