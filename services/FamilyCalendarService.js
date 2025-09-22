@@ -7,6 +7,34 @@ export class FamilyCalendarService {
   // Event listeners for real-time updates
   static listeners = [];
 
+  // Load events from localStorage on service initialization
+  static {
+    this.loadFromStorage();
+  }
+
+  static loadFromStorage() {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const stored = localStorage.getItem('famtime-events');
+        if (stored) {
+          this.mockEvents = JSON.parse(stored);
+        }
+      }
+    } catch (error) {
+      console.log('Could not load events from storage:', error);
+    }
+  }
+
+  static saveToStorage() {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.setItem('famtime-events', JSON.stringify(this.mockEvents));
+      }
+    } catch (error) {
+      console.log('Could not save events to storage:', error);
+    }
+  }
+
   static addListener(callback) {
     this.listeners.push(callback);
   }
@@ -61,6 +89,7 @@ export class FamilyCalendarService {
         };
         
         this.mockEvents.push(newEvent);
+        this.saveToStorage(); // Save to localStorage
         this.notifyListeners(); // Notify calendar to refresh
         return newEvent.id;
       }
@@ -80,6 +109,7 @@ export class FamilyCalendarService {
         };
         
         this.mockEvents.push(newEvent);
+        this.saveToStorage(); // Save to localStorage
         this.notifyListeners(); // Notify calendar to refresh
         return newEvent.id;
       }
@@ -109,8 +139,15 @@ export class FamilyCalendarService {
       };
       
       this.mockEvents.push(newEvent);
+      this.saveToStorage(); // Save to localStorage
       this.notifyListeners(); // Notify calendar to refresh
       return newEvent.id;
     }
+  }
+
+  static clearAllEvents() {
+    this.mockEvents = [];
+    this.saveToStorage();
+    this.notifyListeners();
   }
 }
